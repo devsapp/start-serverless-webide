@@ -1,0 +1,111 @@
+# ------------------------------------
+# ------------------------------------
+#   If you need English case, you can refer to [s_en.yaml] file
+# ------------------------------------
+#   欢迎您使用阿里云函数计算 FC 组件进行项目开发
+#   组件仓库地址：https://github.com/devsapp/fc
+#   组件帮助文档：https://www.serverless-devs.com/fc/readme
+#   Yaml参考文档：https://www.serverless-devs.com/fc/yaml/readme
+#   关于：
+#      - Serverless Devs和FC组件的关系、如何声明/部署多个函数、超过50M的代码包如何部署
+#      - 关于.fcignore使用方法、工具中.s目录是做什么、函数进行build操作之后如何处理build的产物
+#   等问题，可以参考文档：https://www.serverless-devs.com/fc/tips
+#   关于如何做CICD等问题，可以参考：https://www.serverless-devs.com/serverless-devs/cicd
+#   关于如何进行环境划分等问题，可以参考：https://www.serverless-devs.com/serverless-devs/extend
+#   更多函数计算案例，可参考：https://github.com/devsapp/awesome/
+#   有问题快来钉钉群问一下吧：33947367
+edition: 1.0.0
+name: Web IDE
+# access 是当前应用所需要的密钥信息配置：
+# 密钥配置可以参考：https://www.serverless-devs.com/serverless-devs/command/config
+# 密钥使用顺序可以参考：https://www.serverless-devs.com/serverless-devs/tool#密钥使用顺序与规范
+access: "{{ access }}"
+
+vars: # 全局变量
+  region:  "{{ region }}"
+  name: "{{ serviceName }}"
+  fcServiceName: ${vars.name}
+  fcFunctionName: webide
+
+services:
+  vscode-server: # 业务名称/模块名称，通常对应 FC 的一个函数。
+    # 如果只想针对指定的模块进行相关操作，可以在命令行中加上模块名，例如：
+    # 只对 webide-server 进行构建：s webide-server build
+    # 如果直接执行 s build，工具则会对当前Yaml下，所有和 webide-server 平级的业务模块（如有其他平级的模块，例如下面注释的next-function），按照一定顺序进行 build 操作
+    component: fc # 组件名称，Serverless Devs 工具本身类似于一种游戏机，不具备具体的业务能力，组件类似于游戏卡，用户通过向游戏机中插入不同的游戏卡实现不同的功能，即通过使用不同的组件实现不同的具体业务能力
+    actions:
+      pre-deploy:
+        - run: make release
+          path: ./
+        - run: make download-layer
+          path: ./
+        - plugin: layer-fc
+          args:
+            name: openvscode-server
+            codeUri: /tmp/fc-layer
+            #forceUpdate: true
+            runtime:
+              - custom
+    props:
+      region: ${vars.region} # 关于变量的使用方法，可以参考：https://www.serverless-devs.com/serverless-devs/yaml#变量赋值
+      service:
+        name: ${vars.fcServiceName}
+        description: "The web ide service."
+        # logConfig: auto  # 如果您需要查看线上函数执行的日志，取消这个注释
+        # 授予函数计算所需权限的RAM role, 使用场景包含:
+        # 1. 把 function产生的 log 发送到用户的 logstore 中 
+        # 2. 为function 在执行中访问其它云资源生成 token，在本示例中是 fc.yaml 的 OSS bucket 读写权限
+        # 示例: "acs:ram::123456789:role/fcvscoderole" 
+        role: "{{ roleArn }}"
+      function:
+        name: ${vars.fcFunctionName}
+        description: "The openvscode server function."
+        timeout: 900
+        memorySize: 3072
+        runtime: custom
+        codeUri: ./target
+        environmentVariables:
+          PATH: >-
+            /opt/openvscode-server/bin:/opt/openvscode-server:/usr/local/bin/apache-maven/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ruby/bin
+          OSS_BUCKET_NAME: "{{ ossBucket }}" 
+          TZ: "{{ timeZone }}" 
+        customRuntimeConfig:
+          command:
+            - ./webide-server
+          args:
+            - -logtostderr=true
+        caPort: 9000
+        instanceConcurrency: 100
+        initializer: /initialize
+        initializationTimeout: 120
+        instanceLifecycleConfig:
+          preStop:
+            handler: /pre-stop
+            timeout: 600
+      triggers:
+        - name: http_t
+          type: http
+          config:
+            authType: anonymous
+            methods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - HEAD
+              - OPTIONS
+      # 设置 custom domains，
+      customDomains:
+        - domainName: auto # 设置为 auto 时，serverless devs 会自动生成测试域名
+          protocol: HTTP
+          routeConfigs:
+            - path: /*
+              serviceName: ${vars.fcServiceName}
+              functionName: ${vars.fcFunctionName}
+              methods:
+                - GET
+                - POST
+                - PUT
+                - DELETE
+                - HEAD
+                - OPTIONS

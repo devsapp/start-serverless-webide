@@ -1,0 +1,11 @@
+contextSource: fc
+ossBucketName: ls-vscode
+vscode:
+  host: 127.0.0.1
+  port: 3000
+  dataDirectory: ~/.config/vscode-server
+  binaryDirectory:
+  dataOssPath: webide/vscode-server/vscode-server-data.tar.gz
+workspace:
+  directory: /workspace
+  ossPath: webide/vscode-server/workspace.tar.gz
