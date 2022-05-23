@@ -94,8 +94,6 @@ services:
           protocol: HTTP
           routeConfigs:
             - path: /*
-              serviceName: ${vars.fcServiceName}
-              functionName: ${vars.fcFunctionName}
               methods:
                 - GET
                 - POST
