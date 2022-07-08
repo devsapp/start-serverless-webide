@@ -31,12 +31,10 @@ services:
       pre-deploy:
         - run: make release
           path: ./
-        - run: make download-layer
-          path: ./
         - plugin: layer-fc
           args:
             name: openvscode-server
-            codeUri: /tmp/fc-layer
+            codeUri: http://devsapp.functioncompute.com/devsapp/openvscode-server-v1.67.0.zip
             #forceUpdate: true
             runtime:
               - custom
