@@ -3,9 +3,9 @@ ossBucketName: xiliu-vscode
 vscode:
   host: 127.0.0.1
   port: 9527
-  dataDirectory: /Users/songluo/go/src/serverless-webide/target/vscode-server
-  binaryDirectory: /Users/songluo/go/src/serverless-webide/third_party/openvscode-server-v1.67.0-darwin-amd64/bin
+  dataDirectory: /Users/xiliu/go/src/serverless-webide/target/vscode-server
+  binaryDirectory: /Users/xiliu/go/src/serverless-webide/third_party/openvscode-server-v1.67.0-darwin-amd64/bin
   dataOssPath: tests/vscode-server/vscode-server-data.tar.gz
 workspace:
-  directory: /Users/songluo/go/src/serverless-webide/target/workspace
+  directory: /Users/xiliu/go/src/serverless-webide/target/workspace
   ossPath: tests/vscode-server/workspace.tar.gz

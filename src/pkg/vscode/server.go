@@ -111,15 +111,12 @@ func (s *Server) init() error {
 	userDataDir := filepath.Join(s.VscodeDataDir, "user-data")
 	serverDataDir := filepath.Join(s.VscodeDataDir, "server-data")
 	extensionsDir := filepath.Join(s.VscodeDataDir, "extensions")
-	// cmdStr := fmt.Sprintf(
-	// 	"%s --host=%s --port=%s --user-data-dir=%s --server-data-dir=%s --extensions-dir=%s --without-connection-token --start-server --telemetry-level=off",
-	// 	filepath.Join(s.VscodeBinaryDir, "openvscode-server"), s.Host, s.Port, userDataDir, serverDataDir, extensionsDir)
-	// cmd := exec.Command("bash", "-c", cmdStr)
+	// if use token auth, "--connection-token=<my token>"
 	cmd := exec.Command(
 		filepath.Join(s.VscodeBinaryDir, "openvscode-server"),
 		"--host="+s.Host, "--port="+s.Port,
 		"--user-data-dir="+userDataDir, "--server-data-dir="+serverDataDir, "--extensions-dir="+extensionsDir,
-		"--without-connection-token", "--start-server", "--telemetry-level=off")
+		"--without-connection-token", "--start-server", "--telemetry-level=off", "--default-folder="+s.WorkspaceDir)
 	err := cmd.Start()
 	if err != nil {
 		glog.Errorf("Launch vscode server failed. cmd: %s error: %v", cmd.String(), err)

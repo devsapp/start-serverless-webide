@@ -4,7 +4,7 @@ vscode:
   host: 127.0.0.1
   port: 3000
   dataDirectory: ~/.config/vscode-server
-  binaryDirectory:
+  binaryDirectory: /opt/openvscode-server/bin
   dataOssPath: webide/vscode-server/vscode-server-data.tar.gz
 workspace:
   directory: /workspace
