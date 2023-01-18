@@ -137,5 +137,5 @@ func main() {
 	}
 
 	glog.Infof("Reverse proxy listen at %s ...", proxyServer.Addr)
-	glog.Fatalf("Reverse proxy run failed. Error: %v", proxyServer.ListenAndServe())
+	glog.Fatalf("Reverse proxy run. Error: %v", proxyServer.ListenAndServe())
 }
