@@ -73,7 +73,7 @@ services:
         instanceLifecycleConfig:
           preStop:
             handler: /pre-stop
-            timeout: 600
+            timeout: 90
       triggers:
         - name: http_t
           type: http
